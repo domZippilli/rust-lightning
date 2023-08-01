@@ -5,9 +5,9 @@
 #![deny(private_intra_doc_links)]
 
 #![deny(missing_docs)]
-#![deny(unsafe_code)]
-
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
+pub mod fs_store;
 
 #[cfg(test)]
 mod test_utils;
