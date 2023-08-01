@@ -6,6 +6,7 @@ members = [
     "lightning-invoice",
     "lightning-net-tokio",
     "lightning-persister",
+    "lightning-storage",
     "lightning-background-processor",
     "lightning-rapid-gossip-sync"
 ]
