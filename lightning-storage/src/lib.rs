@@ -8,3 +8,6 @@
 #![deny(unsafe_code)]
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
+#[cfg(test)]
+mod test_utils;
