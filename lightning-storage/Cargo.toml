@@ -15,5 +15,4 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 lightning = { version = "0.0.116", path = "../lightning", default-features = false, features = ["std"] }
-rand = "0.8.5"
 libc = "0.2"
