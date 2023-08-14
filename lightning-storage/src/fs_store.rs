@@ -62,6 +62,11 @@ impl KVStore for FilesystemStore {
 		let lock_key = (namespace.to_string(), key.to_string());
 		let inner_lock_ref = Arc::clone(&outer_lock.entry(lock_key).or_default());
 
+		if key.is_empty() {
+			let msg = format!("Failed to read {}/{}: key may not be empty.", namespace, key);
+			return Err(std::io::Error::new(std::io::ErrorKind::Other, msg));
+		}
+
 		let mut dest_file_path = self.data_dir.clone();
 		dest_file_path.push(namespace);
 		dest_file_path.push(key);
@@ -73,6 +78,11 @@ impl KVStore for FilesystemStore {
 		let lock_key = (namespace.to_string(), key.to_string());
 		let inner_lock_ref = Arc::clone(&outer_lock.entry(lock_key).or_default());
 		let _guard = inner_lock_ref.write().unwrap();
+
+		if key.is_empty() {
+			let msg = format!("Failed to write {}/{}: key may not be empty.", namespace, key);
+			return Err(std::io::Error::new(std::io::ErrorKind::Other, msg));
+		}
 
 		let mut dest_file_path = self.data_dir.clone();
 		dest_file_path.push(namespace);
@@ -147,6 +157,11 @@ impl KVStore for FilesystemStore {
 		let inner_lock_ref = Arc::clone(&outer_lock.entry(lock_key.clone()).or_default());
 
 		let _guard = inner_lock_ref.write().unwrap();
+
+		if key.is_empty() {
+			let msg = format!("Failed to remove {}/{}: key may not be empty.", namespace, key);
+			return Err(std::io::Error::new(std::io::ErrorKind::Other, msg));
+		}
 
 		let mut dest_file_path = self.data_dir.clone();
 		dest_file_path.push(namespace);
