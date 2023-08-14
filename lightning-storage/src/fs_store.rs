@@ -13,9 +13,6 @@ use std::sync::{Arc, Mutex, RwLock};
 #[cfg(not(target_os = "windows"))]
 use std::os::unix::io::AsRawFd;
 
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
-
 #[cfg(target_os = "windows")]
 use {std::ffi::OsStr, std::os::windows::ffi::OsStrExt};
 
@@ -104,10 +101,7 @@ impl KVStore for FilesystemStore {
 		// The way to atomically write a file on Unix platforms is:
 		// open(tmpname), write(tmpfile), fsync(tmpfile), close(tmpfile), rename(), fsync(dir)
 		let mut tmp_file_path = dest_file_path.clone();
-		let mut rng = thread_rng();
-		let rand_str: String = (0..7).map(|_| rng.sample(Alphanumeric) as char).collect();
-		let ext = format!("{}.tmp", rand_str);
-		tmp_file_path.set_extension(ext);
+		tmp_file_path.set_extension("tmp");
 
 		{
 			let mut tmp_file = fs::File::create(&tmp_file_path)?;
