@@ -99,9 +99,11 @@ impl KVStore for FilesystemStore {
 		let ext = format!("{}.tmp", rand_str);
 		tmp_file_path.set_extension(ext);
 
-		let mut tmp_file = fs::File::create(&tmp_file_path)?;
-		tmp_file.write_all(&buf)?;
-		tmp_file.sync_all()?;
+		{
+			let mut tmp_file = fs::File::create(&tmp_file_path)?;
+			tmp_file.write_all(&buf)?;
+			tmp_file.sync_all()?;
+		}
 
 		#[cfg(not(target_os = "windows"))]
 		{
