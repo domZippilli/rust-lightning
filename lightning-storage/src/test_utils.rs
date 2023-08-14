@@ -13,7 +13,6 @@ pub(crate) fn do_read_write_remove_list_persist<K: KVStore>(kv_store: &K) {
 
 	// Test empty namespace is allowed, but not empty key.
 	kv_store.write("", key, &data).unwrap();
-	println!("ERR: {:?}", kv_store.write(namespace, "", &data));
 	assert!(kv_store.write(namespace, "", &data).is_err());
 
 	let listed_keys = kv_store.list(namespace).unwrap();
