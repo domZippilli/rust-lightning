@@ -86,7 +86,7 @@ impl KVStore for FilesystemStore {
 				std::io::Error::new(std::io::ErrorKind::InvalidInput, msg)
 			})?
 			.to_path_buf();
-		fs::create_dir_all(parent_directory.clone())?;
+		fs::create_dir_all(&parent_directory)?;
 
 		// Do a crazy dance with lots of fsync()s to be overly cautious here...
 		// We never want to end up in a state where we've lost the old data, or end up using the
@@ -106,7 +106,7 @@ impl KVStore for FilesystemStore {
 		#[cfg(not(target_os = "windows"))]
 		{
 			fs::rename(&tmp_file_path, &dest_file_path)?;
-			let dir_file = fs::OpenOptions::new().read(true).open(parent_directory.clone())?;
+			let dir_file = fs::OpenOptions::new().read(true).open(&parent_directory)?;
 			unsafe {
 				libc::fsync(dir_file.as_raw_fd());
 			}
@@ -206,7 +206,7 @@ impl KVStore for FilesystemStore {
 			return Ok(Vec::new());
 		}
 
-		for entry in fs::read_dir(prefixed_dest.clone())? {
+		for entry in fs::read_dir(&prefixed_dest)? {
 			let entry = entry?;
 			let p = entry.path();
 
@@ -220,7 +220,7 @@ impl KVStore for FilesystemStore {
 				}
 			}
 
-			if let Ok(relative_path) = p.strip_prefix(prefixed_dest.clone()) {
+			if let Ok(relative_path) = p.strip_prefix(&prefixed_dest) {
 				keys.push(relative_path.display().to_string())
 			}
 		}
