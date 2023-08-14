@@ -1,13 +1,9 @@
 use lightning::util::persist::KVStore;
 
-use rand::{thread_rng, RngCore};
-
 pub(crate) fn do_read_write_remove_list_persist<K: KVStore>(kv_store: &K) {
 	use lightning::util::ser::Readable;
 
-	let mut data = [0; 32];
-	thread_rng().fill_bytes(&mut data);
-
+	let data = [42u8; 32];
 
 	let namespace = "testspace";
 	let key = "testkey";
