@@ -1,7 +1,4 @@
 //! Objects related to [`FilesystemStore`] live here.
-#[cfg(target_os = "windows")]
-extern crate winapi;
-
 use lightning::util::persist::KVStore;
 
 use std::collections::HashMap;
@@ -28,7 +25,7 @@ macro_rules! call {
 }
 
 #[cfg(target_os = "windows")]
-fn path_to_windows_str<T: AsRef<OsStr>>(path: T) -> Vec<winapi::shared::ntdef::WCHAR> {
+fn path_to_windows_str<T: AsRef<OsStr>>(path: T) -> Vec<u16> {
 	path.as_ref().encode_wide().chain(Some(0)).collect()
 }
 
@@ -116,33 +113,33 @@ impl KVStore for FilesystemStore {
 			unsafe {
 				libc::fsync(dir_file.as_raw_fd());
 			}
+			Ok(())
 		}
 
 		#[cfg(target_os = "windows")]
 		{
 			if dest_file_path.exists() {
-				unsafe {
-					winapi::um::winbase::ReplaceFileW(
+				call!(unsafe {
+					windows_sys::Win32::Storage::FileSystem::ReplaceFileW(
 						path_to_windows_str(dest_file_path).as_ptr(),
 						path_to_windows_str(tmp_file_path).as_ptr(),
 						std::ptr::null(),
-						winapi::um::winbase::REPLACEFILE_IGNORE_MERGE_ERRORS,
-						std::ptr::null_mut() as *mut winapi::ctypes::c_void,
-						std::ptr::null_mut() as *mut winapi::ctypes::c_void,
+						windows_sys::Win32::Storage::FileSystem::REPLACEFILE_IGNORE_MERGE_ERRORS,
+						std::ptr::null_mut() as *const core::ffi::c_void,
+						std::ptr::null_mut() as *const core::ffi::c_void,
 					)
-				};
+				});
 			} else {
 				call!(unsafe {
-					winapi::um::winbase::MoveFileExW(
+					windows_sys::Win32::Storage::FileSystem::MoveFileExW(
 						path_to_windows_str(tmp_file_path).as_ptr(),
 						path_to_windows_str(dest_file_path).as_ptr(),
-						winapi::um::winbase::MOVEFILE_WRITE_THROUGH
-							| winapi::um::winbase::MOVEFILE_REPLACE_EXISTING,
+						windows_sys::Win32::Storage::FileSystem::MOVEFILE_WRITE_THROUGH
+							| windows_sys::Win32::Storage::FileSystem::MOVEFILE_REPLACE_EXISTING,
 					)
 				});
 			}
 		}
-		Ok(())
 	}
 
 	fn remove(&self, namespace: &str, key: &str) -> std::io::Result<()> {
